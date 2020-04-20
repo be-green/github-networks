@@ -1,0 +1,23 @@
+# Date: 4/20/2020
+
+#Selects commits id, commit time, commiter name, and repository name between 4/20/2019 and 4/20/2020
+````````````````````````````````````````````````````````````````````````````````````````````````````
+
+
+SELECT commit, committer.time_sec, committer.name, repo_name  FROM `bigquery-public-data.github_repos.commits`
+WHERE committer.time_sec< 1587175363 AND committer.time_sec >1555552963
+ORDER BY committer.time_sec DESC
+
+
+#Selects author id, author time (time file was created), author name, repository name between 4/20/2019 and 4/20/2020:
+````````````````````````````````````````````````````````````````````````````````````````````````````
+
+SELECT author, author.time_sec, author.name, repo_name  FROM `bigquery-public-data.github_repos.commits`
+WHERE author.time_sec< 1587175363 AND author.time_sec >1555552963
+ORDER BY author.time_sec DESC
+
+#Combined list of above sorted by commit time.
+````````````````````````````````````````````````````````````````````````````````````````````````````
+SELECT commit, committer.time_sec, committer.name, repo_name, author, author.time_sec, author.name FROM `bigquery-public-data.github_repos.commits`
+WHERE committer.time_sec< 1587175363 AND committer.time_sec >1555552963
+ORDER BY committer.time_sec DESC
