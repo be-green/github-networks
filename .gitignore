@@ -6,6 +6,7 @@
 # No R data or history files
 *.Rdata
 .Rhistory
+*.Rproj
 
 # History files
 .Rhistory
