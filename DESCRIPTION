@@ -1,0 +1,27 @@
+Package: githubnetworks
+Type: Package
+Description: Project for analyzing network activity on github.
+LazyData: true
+ByteCompile: true
+Depends: R (>= 3.5.0), Rcpp (>= 0.12.17), methods
+Imports: 
+    data.table,
+    bigrquery,
+    DBI,
+    igraph,
+    magrittr,
+    ggplot2,
+    utils,
+    stats,
+    testthat
+SystemRequirements: GNU make
+NeedsCompilation: yes
+RoxygenNote: 7.0.2
+Roxygen: list(markdown = TRUE)
+Suggests: 
+    knitr,
+    covr
+VignetteBuilder: knitr
+URL: https://github.com/be-green/github-networks
+BugReports: https://github.com/be-green/github-networks
+Language: en-US
