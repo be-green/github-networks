@@ -1,17 +1,34 @@
-library(httr)
 library(jsonlite)
+library(magrittr)
 
-tmpdir <- tempdir()
 
-download.file("https://data.gharchive.org/2015-01-01-15-0.json.gz",
-              destfile = tmpfile)
+readArchiveFile <- function(timestamp) {
+  # temporary directory to download to
+  tmpdir <- tempdir()
 
-unzip(tmpfile)
+  # name of file to download to
+  destfile <- paste0(tmpdir,".json.gz")
 
-all <- readLines("C:\\Users\\heroo\\AppData\\Local\\Temp\\RtmpGEnzS7\\file12b0331f499~\\file12b0331f499~")
+  # url to download from
+  file_url <- makeArchiveQueryString(timestamp)
+  download.file(file_url,
+                destfile = destfile,
+                method = "curl",
+                quiet = T)
 
-first_result <- all[[2]] %>%
-  jsonlite::fromJSON()
+  con <- gzfile(destfile)
+  lines <- readLines(con)
+  close(con)
+
+  # delete tempfile
+  unlink(destfile)
+
+  lines
+}
+
+makeJSONList <- function(archiveFileLines) {
+  lapply(archiveFileLines, jsonlite::fromJSON)
+}
 
 parseResult <- function(result) {
 
@@ -30,8 +47,36 @@ parseResult <- function(result) {
   )
 }
 
-all <- all %>%
-  lapply(jsonlite::fromJSON) %>%
-  lapply(parseResult) %>%
-  rbindlist(idcol = T, fill = T)
+#' List all hours on a day
+#' for purposes of query GH Archive
+listAllHours <- function(date) {
+  paste0(date,"-", 0:23)
+}
+
+#' Convenience function for seq.Date
+listAllDates <- function(start, end) {
+  seq(as.Date(start),
+      as.Date(end), by="days")
+}
+
+# Turn
+makeArchiveQueryString <- function(timestamp) {
+  paste0("https://data.gharchive.org/",
+         timestamp,
+         ".json.gz")
+}
+
+getObjSize <- function(obj, units = "Gb") {
+  format(object.size(obj), units = units, digits = 7)
+}
+
+
+readArchiveFiles <- function(timestamps) {
+  lapply(timestamps, readArchiveFile)
+}
+
+parseResult <- function(jsonResult, type) {
+  do.call(paste0(parse,stringr::str_to_title(type)),
+          jsonObj = jsonResult)
+}
 
