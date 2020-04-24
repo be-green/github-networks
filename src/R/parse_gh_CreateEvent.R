@@ -18,14 +18,6 @@ create_events <-
   Filter(function(x) x$type == "CreateEvent",
          first_week_events)
 
-#' Adds a prefix to a data.table
-#' @param DT data.table to pass
-#' @param prefix prefix to apply to column names
-addPrefix <- function(DT, prefix) {
-  setnames(DT,
-           colnames(DT),
-           paste0("actor_", colnames(DT)))
-}
 
 #' Parses a CreateEvent returned from the
 #' github API
