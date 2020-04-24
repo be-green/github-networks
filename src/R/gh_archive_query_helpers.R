@@ -1,7 +1,9 @@
-
+source("src/R/parse_gh_archive.R")
 
 first_week_events <-
-  listAllDates("2020-02-01", "2020-02-14") %>%
-  listAllHours() %>%
-  readArchiveFiles()
+  readArchiveFile("2019-02-14-23") %>%
+  makeJSONList
+
+first_week_events %>%
+  Filter(function(x) x$type == "IssuesEvent", .)
 

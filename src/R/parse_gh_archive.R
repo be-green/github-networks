@@ -7,7 +7,7 @@ readArchiveFile <- function(timestamp) {
   tmpdir <- tempdir()
 
   # name of file to download to
-  destfile <- paste0(tmpdir,".json.gz")
+  destfile <- paste0(tmpdir,"\\",timestamp,".json.gz")
 
   # url to download from
   file_url <- makeArchiveQueryString(timestamp)

@@ -1,43 +1,46 @@
 library(jsonlite)
 library(magrittr)
 library(data.table)
-library(foreach)
 
 #Date: 4/23/20
-#Description: Take in a single entry that has type ="CreateEvent" and parse it into a data table
-#Next goal is to parse every entry with "CreateEvent" into a data table
+#Description: Take in a single entry that
+# has type = "CreateEvent" and parse it into a data table
+# Next goal is to parse every entry with
+# "CreateEvent" into a data table
 
+source("src/R/parse_gh_archive.R")
 
+first_week_events <-
+  readArchiveFile("2019-02-14-23") %>%
+  makeJSONList
 
+create_events <-
+  Filter(function(x) x$type == "CreateEvent",
+         first_week_events)
 
-List_first_week <-makeJSONList(first_week_events)
-
-CreateEvents <- Filter(function(x) x$type == "CreateEvent", List_first_week)
-
-
-sapply(testm, function(x) x$type) %>% unique
-
-
- n <- length(CreateEvents)
-
-foreach i in n {
-
-
+#' Adds a prefix to a data.table
+#' @param DT data.table to pass
+#' @param prefix prefix to apply to column names
+addPrefix <- function(DT, prefix) {
+  setnames(DT,
+           colnames(DT),
+           paste0("actor_", colnames(DT)))
 }
-CreateEvent <- checkRunEvent[[1]]
 
-
-CreateEvent$
-
-
-Actors <- CreateEvent$actor
-
-
+#' Parses a CreateEvent returned from the
+#' github API
+#' @param result CreateEvent result from the API
+#' @return returns a data.table that parsed the event
 parseCreateEvent <- function(result) {
 
   actorTable <- as.data.table(result$actor)
+  addPrefix(actorTable, "actor_")
+
   payloadTable <- as.data.table(result$payload)
+  addPrefix(payloadTable, "payload_")
+
   repoTable <- as.data.table(result$repo)
+  addPrefix(repoTable, "repo_")
 
   data.table(
     id = result$id,
@@ -50,7 +53,7 @@ parseCreateEvent <- function(result) {
   )
 }
 
-
-CreateEventTable <- lapply(parseCreateEvent, CreateEvents)
-
-CreateEventTable$created_at
+# should have 9281 rows
+create_events_table <-
+  lapply(create_events, parseCreateEvent) %>%
+  rbindlist(fill = T)
