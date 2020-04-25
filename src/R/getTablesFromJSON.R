@@ -32,39 +32,51 @@ getRepoTable <- function(event) {
   getTable(event, "repo")
 }
 
-getParentTable <- function(event) {
+getEventTable <- function(event) {
   data.table(
     event_id = event$id,
     event_type = event$type,
     event_public = event$pubic,
-    event_created_at = event$created_at
+    event_created_at = event$created_at,
+    actor_id = event$actor$id,
+    org_id = event$org$id,
+    repo_id = event$repo$id
   )
 }
 
-# this needs to change by event type
+#' Dispatches relevant payload parser based on event type
+#' @param event item in list of JSON responses converted by jsonlite
 getPayloadTable <- function(event) {
   do.call(
     paste0("get",
            event$type,
            "Payload"),
     args = list(
-      payload = event$payload
+      payload = event$payload,
+      event_id = event$id
     )
   )
 }
 
 
 # parse payload for create event
-getCreateEventPayload <- function(payload) {
-  payload <- as.data.table(payload)
+getCreateEventPayload <- function(payload, event_id) {
+  payload <- as.data.table(payload, event_id)
   payload <- addPrefix(payload, "create_")
   payload
 }
 
+
+# parse payload for create event
+getPullRequestEventPayload <- function(payload, event_id) {
+  browser()
+}
+
+
 # return of all the tables from the event
 getAllTables <- function(event) {
   list(
-    EventTable = getParentTable(event),
+    EventTable = getEventTable(event),
     ActorTable = getActorTable(event),
     OrgTable = getOrgTable(event),
     RepoTable = getRepoTable(event),
