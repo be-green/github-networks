@@ -1,5 +1,6 @@
 # method for compiling tables from JSON
 library(data.table)
+source("src/R/generalize_parser.R")
 
 #' Adds a prefix to a data.table
 #' @param DT data.table to pass
@@ -47,40 +48,34 @@ getEventTable <- function(event) {
 #' Dispatches relevant payload parser based on event type
 #' @param event item in list of JSON responses converted by jsonlite
 getPayloadTable <- function(event) {
-  do.call(
-    paste0("get",
-           event$type,
-           "Payload"),
-    args = list(
-      payload = event$payload,
-      event_id = event$id
-    )
-  )
+  if(length(event$payload) == 0) {
+    return(NULL)
+  }
+  node_table(
+      node = event$payload,
+      parent_id = event$id,
+      nodename = event$type,
+      parent_name = event$type
+  ) %>%
+    get_data(name = event$type)
 }
-
-
-# parse payload for create event
-getCreateEventPayload <- function(payload, event_id) {
-  payload <- as.data.table(payload, event_id)
-  payload <- addPrefix(payload, "create_")
-  payload
-}
-
 
 # parse payload for create event
 getPullRequestEventPayload <- function(payload, event_id) {
   browser()
 }
 
-
 # return of all the tables from the event
 getAllTables <- function(event) {
-  list(
+  dataTables <- getPayloadTable(event)
+  c(
+    list(
     EventTable = getEventTable(event),
     ActorTable = getActorTable(event),
     OrgTable = getOrgTable(event),
-    RepoTable = getRepoTable(event),
-    PayloadTable = getPayloadTable(event)
+    RepoTable = getRepoTable(event)
+    ),
+    dataTables
   )
 }
 
