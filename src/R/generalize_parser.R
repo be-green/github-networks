@@ -1,5 +1,4 @@
 library(tidyr)
-library(rlist)
 library(rlang)
 library(data.table)
 
@@ -17,7 +16,9 @@ filter_is_list <- function(l) {
 
 flatten_with_names <- function(x) {
   nms <- names(x)
-  x <- rlang::flatten(x)
+  suppressWarnings({
+    x <-rlang::flatten(x)
+  })
   names(x) <- paste0(nms, "_", names(x))
   x
 }
@@ -51,7 +52,19 @@ node_table <- function(node,
                     unnest_singleton_list)
 
   terminal_dt <- as.data.table(terminal_nodes)
-  new_parent_id <- terminal_dt$id
+  col_names <- colnames(terminal_dt)
+  if("id" %in% col_names) {
+    idcol <- "id"
+  } else {
+    idcol <- subset(col_names, col_names %like% "id")
+  }
+
+  if(length(idcol) > 0) {
+    new_parent_id <- terminal_dt[[head(idcol,1)]]
+  } else {
+    new_parent_id <- parent_id
+    nodename <- parent_name
+  }
 
   if(!is.null(nodename) & nrow(terminal_dt) > 0) {
 
@@ -103,8 +116,9 @@ get_data <- function(l, name) {
 
   get_data_to_parent(l, name)
 
-  lapply(ls(envir), function(x) get(x, envir = envir))
-
+  l <- lapply(ls(envir), function(x) get(x, envir = envir))
+  names(l) <- paste0(stringr::str_to_title(ls(envir)),"Detail")
+  l
 }
 
 

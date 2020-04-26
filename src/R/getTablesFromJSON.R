@@ -55,7 +55,7 @@ getPayloadTable <- function(event) {
       node = event$payload,
       parent_id = event$id,
       nodename = event$type,
-      parent_name = event$type
+      parent_name = "event"
   ) %>%
     get_data(name = event$type)
 }
@@ -68,6 +68,7 @@ getPullRequestEventPayload <- function(payload, event_id) {
 # return of all the tables from the event
 getAllTables <- function(event) {
   dataTables <- getPayloadTable(event)
+
   c(
     list(
     EventTable = getEventTable(event),
@@ -78,5 +79,20 @@ getAllTables <- function(event) {
     dataTables
   )
 }
+
+
+bindRowsByName <- function(returnList) {
+  nms <- sapply(returnList, names) %>% unlist %>% unique
+  l <- lapply(nms,
+         function(name, dataList) {
+           rbindlist(dataList[which(names(dataList) == name)], fill = T)
+         },
+  dataList = rlang::flatten(returnList))
+
+  names(l) <- nms
+
+  l
+}
+
 
 

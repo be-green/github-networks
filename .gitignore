@@ -3,6 +3,9 @@
 *.xlsx
 *.xls
 
+# don't store data on github
+*.csv
+
 # No R data or history files
 *.Rdata
 .Rhistory
