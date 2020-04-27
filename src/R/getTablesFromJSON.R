@@ -12,6 +12,7 @@ addPrefix <- function(DT, prefix) {
   DT
 }
 
+#' Get table from event with associated label
 getTable <- function(event, type) {
   if(is.null(event[[type]])) {
     return(NULL)
