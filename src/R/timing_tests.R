@@ -4,7 +4,9 @@ source("src/R/generalize_parser.R")
 source("src/R/getTablesFromJSON.R")
 source("src/R/dataPipeline.R")
 
-cl <- parallel::makeCluster(detectCores())
+library(parallel)
+
+cl <- parallel::makeCluster(2)
 
 parallel::clusterEvalQ(cl, {
   source("src/R/setup.R")
@@ -12,16 +14,21 @@ parallel::clusterEvalQ(cl, {
   source("src/R/generalize_parser.R")
   source("src/R/getTablesFromJSON.R")
   source("src/R/dataPipeline.R")
-
 })
 
-date_sequence <- listAllDates("2019-12-31",
-                              "2020-04-26") %>%
+in_bucket <- aws.s3::get_bucket("github-archive",
+                                region = "") %>%
+  sapply(function(x) x$Key %>%
+           str_extract("/(.*?)/") %>%
+           str_replace_all("/",""))
+
+date_sequence <- listAllDates("2020-01-01", Sys.Date()) %>%
   lapply(listAllHours) %>%
-  unlist
+  unlist %>%
+  setdiff(in_bucket)
 
 parallel::parLapply(
   cl,
-  date_sequence,
+  tail(date_sequence, 2),
   processHourlyFiles
 )

@@ -14,6 +14,8 @@ writeToCSVs <- function(tableList, timestamp) {
 
 processHourlyFiles <- function(hourly_string) {
 
+  message("Processing ", hourly_string)
+
   readArchiveFile(hourly_string) %>%
     makeJSONList %>%
     lapply(getAllTables) %>%
