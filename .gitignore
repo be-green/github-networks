@@ -6,6 +6,9 @@
 # don't store data on github
 *.csv
 
+# no logs
+*.log
+
 # No R data or history files
 *.Rdata
 .Rhistory
