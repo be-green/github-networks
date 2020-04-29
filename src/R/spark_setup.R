@@ -13,8 +13,8 @@ conf$spark.hadoop.fsa.s3a.region <- ""
 
 sc <- spark_connect(master = "local",
                     spark_home = paste0(sparklyr::spark_install_dir(),
-                                        "spark/spark-2.4.3-bin-hadoop2.7/"),
-                    config =  conf)
+                                        "/spark-2.4.3-bin-hadoop2.7/"),
+                    config = conf)
 
 links <- spark_read_csv(sc, "s3a://github-archive/data/*/AssetsDetail.csv",
                         memory = FALSE,
