@@ -8,6 +8,7 @@
 
 # no logs
 *.log
+logs/*
 
 # No R data or history files
 *.Rdata
