@@ -17,7 +17,9 @@ readArchiveFile <- function(timestamp) {
                 quiet = T)
 
   con <- gzfile(destfile)
-  lines <- readLines(con)
+  suppressWarnings({
+    lines <- readLines(con)
+  })
   close(con)
 
   # delete tempfile

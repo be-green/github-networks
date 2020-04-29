@@ -36,3 +36,6 @@ parallel::parLapply(
 
 parallel::stopCluster(cl)
 
+
+processHourlyFiles(date_sequence[2])
+

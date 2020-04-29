@@ -23,29 +23,47 @@ processHourlyFiles <- function(hourly_string) {
     x
   }
 
-  hourly_string %>%
+  event_list <- hourly_string %>%
     log("making list",file=logfile) %>%
     readArchiveFile() %>%
     log("reading file",file=logfile) %>%
-    makeJSONList %>%
-    log("getting tables",file=logfile) %>%
-    lapply(getAllTables) %>%
-    log("binding rows",file=logfile) %>%
-    bindRowsByName %>%
-    log("writing tables",file=logfile) %>%
-    writeToCSVs(., timestamp = hourly_string) %>%
-    log("saving to cloud",file=logfile) %>%
-    lapply(saveFileToWasabi)
+    {
+      tryCatch({
+        makeJSONList(.)},
+        error = function(e) {
+          log(e,
+              "specified key doesn't exist, exiting.",
+              file = logfile)
+          return()
+        })
+    }
+
+  if(inherits(event_list, "simpleError")) {
+    return()
+  } else {
+    event_list %>%
+      log("getting tables",file=logfile) %>%
+      lapply(getAllTables) %>%
+      log("binding rows",file=logfile) %>%
+      bindRowsByName %>%
+      log("writing tables",file=logfile) %>%
+      writeToCSVs(., timestamp = hourly_string) %>%
+      log("saving to cloud",file=logfile) %>%
+      lapply(saveFileToWasabi)
+  }
 
   write("done.",file=logfile,append=TRUE)
 
 }
+
 saveFileToWasabi <- function(filename) {
   aws.s3::put_object(object = filename,
                      file = filename,
                      bucket = "github-archive",
                      region = "")
 }
+
+
 
 
 
