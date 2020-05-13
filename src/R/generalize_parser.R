@@ -120,5 +120,3 @@ get_data <- function(l, name) {
   names(l) <- paste0(stringr::str_to_title(ls(envir)),"Detail")
   l
 }
-
-

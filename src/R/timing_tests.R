@@ -13,10 +13,31 @@ in_bucket <- aws.s3::get_bucket("github-archive",
            str_replace_all("/","")) %>%
   unique
 
-date_sequence <- listAllDates("2020-03-01", Sys.Date()) %>%
+check_updates <- function(date_sequence) {
+  date_sequence[
+    which(
+      paste0("data/", date_sequence, "/ActorTable.csv") %>%
+        sapply(function(x){
+          suppressMessages({
+
+            aws.s3::object_exists(object = x, bucket = "github-archive", region = "")
+
+          })
+        })
+    )
+  ]
+}
+
+new_stuff <- check_updates(date_sequence)
+
+in_bucket <- unique(c(in_bucket, new_stuff))
+
+date_sequence <- listAllDates("2020-01-01", Sys.Date()) %>%
   lapply(listAllHours) %>%
   unlist %>%
   setdiff(in_bucket)
+
+qplot(as.Date(date_sequence), geom = "bar")
 
 cl <- parallel::makeCluster(16)
 
